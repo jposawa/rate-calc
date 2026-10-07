@@ -1,0 +1,15 @@
+.wrapper {
+  display: inline-block;
+}
+
+.message {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

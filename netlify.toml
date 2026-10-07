@@ -1,0 +1,7 @@
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[build.environment]
+  # A @jposawa/ronin-ui pede Node >= 22.
+  NODE_VERSION = "22"

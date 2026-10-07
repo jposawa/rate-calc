@@ -1,0 +1,76 @@
+/**
+ * O único CSS global do projeto: os valores dos tokens e a base do `body`.
+ * Todo o resto é `.module.css`, ao lado do componente que ele estiliza.
+ *
+ * A `@jposawa/ronin-ui` define os NOMES e valores padrão dos tokens; este
+ * arquivo define os VALORES deste app, com a paleta do conversor original.
+ * Fica **fora de `@layer`** — CSS sem camada vence CSS em camada, qualquer
+ * que seja a ordem de import, e é assim que a biblioteca manda sobrescrever.
+ *
+ * Segue o tema do sistema. Não há seletor de tema, então não há
+ * `data-ronin-theme` em lugar nenhum.
+ */
+
+:root {
+  --font-sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --color-bg: #eef2ee;
+  --color-bg-elevated: #f9fbf8;
+  --color-surface: #e2e9e3;
+  --color-border: #cbd6ce;
+
+  --color-text: #15302a;
+  --color-text-strong: #15302a;
+  --color-text-muted: #586b63;
+  --color-text-disabled: #9fb0a8;
+
+  --color-primary: #1f5c4a;
+  --color-neutral: #586b63;
+  --color-danger: #a23b2a;
+  --color-on-accent: #f9fbf8;
+
+  /* As três partes do resultado: o que fica, o imposto e o spread. */
+  --color-net: #1f5c4a;
+  --color-tax: #46607c;
+  --color-spread: #b07f24;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0d1526;
+    --color-bg-elevated: #141f33;
+    --color-surface: #1b2840;
+    --color-border: #2a3750;
+
+    --color-text: #e3e9f2;
+    --color-text-strong: #e3e9f2;
+    --color-text-muted: #96a3b8;
+    --color-text-disabled: #4f5c74;
+
+    --color-primary: #5fb596;
+    --color-neutral: #96a3b8;
+    --color-danger: #e07a66;
+    /* Acento claro no escuro: o texto sobre ele precisa ser escuro. */
+    --color-on-accent: #0d1526;
+
+    --color-net: #5fb596;
+    --color-tax: #a7b9ec;
+    --color-spread: #d9a94c;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

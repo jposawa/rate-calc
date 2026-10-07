@@ -1,0 +1,21 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+/* Vazio continua no DOM e visível: uma região `role="status"` escondida com
+   `display: none` sai da árvore de acessibilidade e pode não anunciar o texto
+   que chega depois. Sem conteúdo, ela não ocupa altura. */
+.status {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}

@@ -1,0 +1,21 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.output {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.output strong {
+  font-weight: 600;
+  color: var(--color-text-strong);
+}
+
+.note {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}

@@ -1,0 +1,16 @@
+.shell {
+  min-height: 100svh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/**
+ * O selo do Netlify, que ele injeta num iframe fora da árvore do React — mesma
+ * regra do `dhsw`. `:global` porque o id é do Netlify: sem ele, o CSS Modules
+ * renomearia `#nl-badge-frame` para `#_nl-badge-frame_xxxx` e não pegaria nada.
+ */
+:global(iframe#nl-badge-frame) {
+  display: none !important;
+}
