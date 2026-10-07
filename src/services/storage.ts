@@ -1,6 +1,6 @@
-import { LOCALE_KEY, STORAGE_KEY } from "@/constants"
+import { FX_CHECKS_KEY, FX_PROVIDERS, LOCALE_KEY, ONLINE_FX_SOURCES, STORAGE_KEY } from "@/constants"
 import { isFxMeta } from "@/helpers"
-import type { FormValues, Locale } from "@/types"
+import type { FormValues, FxChecks, Locale } from "@/types"
 
 type StoredValues = {
   values: FormValues
@@ -32,7 +32,11 @@ export const loadValues = (defaults: FormValues): StoredValues | null => {
     const values: FormValues = { ...defaults, ...data.values }
 
     return {
-      values: { ...values, fxMeta: isFxMeta(values.fxMeta) ? values.fxMeta : null },
+      values: {
+        ...values,
+        fxMeta: isFxMeta(values.fxMeta) ? values.fxMeta : null,
+        fxProvider: FX_PROVIDERS.includes(values.fxProvider) ? values.fxProvider : defaults.fxProvider,
+      },
       savedAt: typeof data.savedAt === "number" ? data.savedAt : null,
     }
   } catch {
@@ -75,5 +79,39 @@ export const saveLocale = (locale: Locale) => {
     localStorage.setItem(LOCALE_KEY, locale)
   } catch {
     // Sem armazenamento, o idioma vale só nesta visita.
+  }
+}
+
+/** Quando cada fonte de cotação respondeu pela última vez. Só fontes conhecidas, com horário numérico. */
+export const loadFxChecks = (): FxChecks => {
+  try {
+    const data = JSON.parse(localStorage.getItem(FX_CHECKS_KEY) ?? "{}")
+    const checks: FxChecks = {}
+
+    for (const source of ONLINE_FX_SOURCES) {
+      if (typeof data?.[source] === "number") {
+        checks[source] = data[source]
+      }
+    }
+
+    return checks
+  } catch {
+    return {}
+  }
+}
+
+export const saveFxChecks = (checks: FxChecks) => {
+  try {
+    localStorage.setItem(FX_CHECKS_KEY, JSON.stringify(checks))
+  } catch {
+    // Sem armazenamento, os horários valem só nesta visita.
+  }
+}
+
+export const clearFxChecks = () => {
+  try {
+    localStorage.removeItem(FX_CHECKS_KEY)
+  } catch {
+    // Sem acesso ao armazenamento não há o que apagar.
   }
 }

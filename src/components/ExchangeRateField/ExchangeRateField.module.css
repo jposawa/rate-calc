@@ -1,21 +1,32 @@
-/* O campo ocupa a linha inteira; botão e andamento dividem a de baixo, e o
-   andamento desce sozinho quando não cabe ao lado. */
+/* O campo ocupa a linha inteira. Na de baixo, a fonte cresce para ocupar o
+   que sobra ao lado do botão; quando não cabem juntos, cada um vai para uma
+   linha. `flex-end` alinha o botão com a caixa do Select, não com o rótulo. */
 .field {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--space-3) var(--space-4);
 }
 
-.input {
+.fullWidth {
   flex-basis: 100%;
+}
+
+.provider {
+  flex-grow: 1;
+  flex-basis: 14rem;
+  min-width: 0;
 }
 
 /* Vazio continua no DOM e visível: uma região `role="status"` escondida com
    `display: none` sai da árvore de acessibilidade e pode não anunciar o texto
-   que chega depois. Sem conteúdo, ela não ocupa largura e cabe ao lado do
-   botão, então não abre uma linha vazia. */
+   que chega depois. Vazia, ela não tem largura nem altura e cabe na linha do
+   botão; com texto, desce para uma linha só dela. */
 .status {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+}
+
+.status:not(:empty) {
+  flex-basis: 100%;
 }

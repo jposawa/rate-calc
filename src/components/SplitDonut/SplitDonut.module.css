@@ -1,7 +1,7 @@
-/* Rosca e legenda lado a lado; a nota embaixo, na largura toda. */
+/* Mobile-first: rosca, legenda e nota um embaixo do outro, na largura toda. */
 .chart {
   display: grid;
-  grid-template-columns: 9.5rem minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4) 1.25rem;
   align-items: center;
 }
@@ -10,6 +10,7 @@
 .donut {
   display: grid;
   place-items: center;
+  justify-self: center;
   width: 9.5rem;
   aspect-ratio: 1;
 }
@@ -89,19 +90,18 @@
 }
 
 .note {
-  grid-column: 1 / -1;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-@media (max-width: 24rem) {
+/* Com espaço, rosca e legenda lado a lado; a nota continua na linha toda. */
+@media (min-width: 28rem) {
   .chart {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    grid-template-columns: 9.5rem minmax(0, 1fr);
   }
 
-  .legend {
-    width: 100%;
+  .note {
+    grid-column: 1 / -1;
   }
 }
 

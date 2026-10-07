@@ -3,7 +3,9 @@
 Do valor/hora em dólar ao líquido em reais: total do mês em USD, conversão pela
 cotação, desconto do spread e do imposto da nota. Inclui uma calculadora da
 alíquota do Simples Nacional (Anexo III) e busca a cotação de compra do dólar
-(PTAX do Banco Central, com AwesomeAPI e Frankfurter de reserva).
+na fonte escolhida: PTAX do Banco Central, AwesomeAPI, Frankfurter, ou a
+automática, que tenta nessa ordem. Cada fonte mostra quando respondeu pela
+última vez neste navegador.
 
 Os valores ficam salvos no `localStorage` do navegador. "Copiar link" gera uma
 URL com o cálculo em `?share=<código>` (JSON em base64url) — quem abre vê os

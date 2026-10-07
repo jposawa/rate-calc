@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState } from "react"
 
 import { DEFAULT_VALUES, SAVE_DELAY_MS } from "@/constants"
-import { clearShareParam, clearValues, loadValues, readSharedValues, saveValues } from "@/services"
-import type { FormValues, MessageKey } from "@/types"
+import {
+  clearFxChecks,
+  clearShareParam,
+  clearValues,
+  loadFxChecks,
+  loadValues,
+  readSharedValues,
+  saveFxChecks,
+  saveValues,
+} from "@/services"
+import type { FormValues, MessageKey, OnlineFxSource } from "@/types"
 
 import { useTranslation } from "./useTranslation"
 
@@ -49,6 +58,7 @@ export const useStoredValues = () => {
   const [initial] = useState(() => loadInitial(DEFAULT_VALUES[locale]))
   const [values, setValues] = useState(initial.values)
   const [status, setStatus] = useState(initial.status)
+  const [fxChecks, setFxChecks] = useState(loadFxChecks)
   const isDirty = useRef(false)
 
   useEffect(clearShareParam, [])
@@ -76,14 +86,25 @@ export const useStoredValues = () => {
   const reset = () => {
     isDirty.current = false
     clearValues()
+    clearFxChecks()
+    setFxChecks({})
     setValues(DEFAULT_VALUES[locale])
     setStatus({ key: "status.cleared" })
+  }
+
+  /** Anota que a fonte acabou de responder. Grava na hora: não é campo do formulário. */
+  const recordFxCheck = (source: OnlineFxSource) => {
+    const next = { ...fxChecks, [source]: Date.now() }
+    setFxChecks(next)
+    saveFxChecks(next)
   }
 
   return {
     values,
     update,
     reset,
+    fxChecks,
+    recordFxCheck,
     status: status ? t(status.key, { date: status.savedAt ? fmt.dateTime(status.savedAt) : "" }) : "",
   }
 }

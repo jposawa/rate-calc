@@ -1,4 +1,4 @@
-import { Input } from "@jposawa/ronin-ui"
+import { Input, Switch } from "@jposawa/ronin-ui"
 
 import {
   ClearDataButton,
@@ -26,9 +26,9 @@ const TAX_INPUT_ID = "tax"
  */
 export const Home = () => {
   const { t, fmt } = useTranslation()
-  const { values, update, reset, status } = useStoredValues()
+  const { values, update, reset, status, fxChecks, recordFxCheck } = useStoredValues()
   const { errors, input } = validateValues(values)
-  const breakdown = input ? computeBreakdown(input) : null
+  const breakdown = input ? computeBreakdown(input, values.isTaxBeforeSpread) : null
 
   const errorFor = (field: NumericField) => {
     const key = errors[field]
@@ -45,13 +45,12 @@ export const Home = () => {
     <main className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>{t("home.title")}</h1>
-        <LocaleSwitch className={styles.locale} />
+        <LocaleSwitch />
         <p className={styles.intro}>{t("home.intro")}</p>
       </header>
 
       <form className={styles.form} autoComplete="off" noValidate onSubmit={(event) => event.preventDefault()}>
         <DecimalInput
-          className={styles.halfWidth}
           decimals={2}
           label={t("field.rate.label")}
           value={values.rate}
@@ -60,7 +59,6 @@ export const Home = () => {
           placeholder={t("field.rate.placeholder")}
         />
         <Input
-          className={styles.halfWidth}
           label={t("field.hours.label")}
           value={values.hours}
           onValueChange={(hours) => update({ hours })}
@@ -74,13 +72,18 @@ export const Home = () => {
           value={values.fx}
           meta={values.fxMeta}
           errorMessage={errorFor("fx")}
+          provider={values.fxProvider}
+          checks={fxChecks}
           // Digitou por cima: a origem anterior deixa de valer.
           onValueChange={(fx) => update({ fx, fxMeta: null })}
-          onQuote={({ rate, ...fxMeta }) => update({ fx: fmt.rateInput(rate), fxMeta })}
+          onProviderChange={(fxProvider) => update({ fxProvider })}
+          onQuote={({ rate, ...fxMeta }) => {
+            update({ fx: fmt.rateInput(rate), fxMeta })
+            recordFxCheck(fxMeta.source)
+          }}
         />
 
         <Input
-          className={styles.halfWidth}
           label={t("field.spread.label")}
           value={values.spread}
           onValueChange={(spread) => update({ spread })}
@@ -89,17 +92,26 @@ export const Home = () => {
           inputMode="decimal"
           placeholder={t("field.spread.placeholder")}
         />
-        <Input
-          id={TAX_INPUT_ID}
-          className={styles.halfWidth}
-          label={t("field.tax.label")}
-          value={values.tax}
-          onValueChange={(tax) => update({ tax })}
-          hint={t("field.tax.hint")}
-          errorMessage={errorFor("tax")}
-          inputMode="decimal"
-          placeholder="6"
-        />
+        {/* O imposto e a base dele ficam juntos: o switch muda o que o campo significa. */}
+        <div className={styles.taxField}>
+          <Input
+            id={TAX_INPUT_ID}
+            label={t("field.tax.label")}
+            value={values.tax}
+            onValueChange={(tax) => update({ tax })}
+            hint={t("field.tax.hint")}
+            errorMessage={errorFor("tax")}
+            inputMode="decimal"
+            placeholder="6"
+          />
+          {/* Ligado é pós spread, o padrão; o rótulo diz a base que vale agora. */}
+          <Switch
+            label={t(values.isTaxBeforeSpread ? "field.tax.beforeSpread" : "field.tax.afterSpread")}
+            hint={t(values.isTaxBeforeSpread ? "field.tax.beforeSpreadHint" : "field.tax.afterSpreadHint")}
+            isChecked={!values.isTaxBeforeSpread}
+            onToggle={() => update({ isTaxBeforeSpread: !values.isTaxBeforeSpread })}
+          />
+        </div>
 
         <TaxRateHelper
           className={styles.fullWidth}

@@ -7,8 +7,17 @@ export type MessageKey = keyof typeof ptBR
 
 export type Messages = Record<MessageKey, string>
 
+/** As fontes de cotação na internet. */
+export type OnlineFxSource = "ptax" | "awesome" | "frankfurter"
+
 /** De onde veio a cotação. O nome que aparece na tela é `fx.source.<fonte>`. */
-export type FxSource = "manual" | "ptax" | "awesome" | "frankfurter"
+export type FxSource = "manual" | OnlineFxSource
+
+/** Onde o botão busca: numa fonte só, ou na automática, que tenta as fontes em ordem. */
+export type FxProvider = "auto" | OnlineFxSource
+
+/** Quando cada fonte respondeu pela última vez, em milissegundos. */
+export type FxChecks = Partial<Record<OnlineFxSource, number>>
 
 /**
  * De onde veio a cotação e quando — o que aparece embaixo do campo.
@@ -22,7 +31,9 @@ export type FxMeta = {
   date: string
 }
 
+/** Uma cotação buscada — sempre de uma fonte da internet, nunca "manual". */
 export type FxQuote = FxMeta & {
+  source: OnlineFxSource
   rate: number
 }
 
@@ -39,10 +50,14 @@ export type FormValues = {
   fx: string
   spread: string
   tax: string
+  /** O imposto incide sobre o valor antes do spread. Padrão: depois. */
+  isTaxBeforeSpread: boolean
   rbt12: string
   isExport: boolean
   /** `null` quando a cotação foi digitada à mão. */
   fxMeta: FxMeta | null
+  /** A fonte escolhida para o botão de busca. */
+  fxProvider: FxProvider
 }
 
 export type NumericField = "rate" | "hours" | "fx" | "spread" | "tax"
@@ -53,6 +68,8 @@ export type FieldErrors = Partial<Record<NumericField, MessageKey>>
 export type BreakdownInput = Record<NumericField, number>
 
 export type Breakdown = BreakdownInput & {
+  /** O imposto saiu do valor convertido cheio, e não do que sobrou após o spread. */
+  isTaxBeforeSpread: boolean
   usd: number
   /** Convertido pela cotação cheia, antes do spread. Base dos percentuais. */
   gross: number

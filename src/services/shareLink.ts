@@ -8,7 +8,7 @@ import type { FormValues } from "@/types"
  */
 const SHARED_FIELDS = ["rate", "hours", "fx", "spread", "tax"] as const
 
-export type SharedValues = Pick<FormValues, (typeof SHARED_FIELDS)[number] | "fxMeta">
+export type SharedValues = Pick<FormValues, (typeof SHARED_FIELDS)[number] | "isTaxBeforeSpread" | "fxMeta">
 
 /** Base64 que aceita qualquer texto — `btoa` sozinho quebra fora do Latin-1 — e cabe numa URL. */
 const toBase64Url = (text: string): string => {
@@ -30,6 +30,7 @@ export const encodeShareCode = (values: FormValues): string => {
     fx: values.fx,
     spread: values.spread,
     tax: values.tax,
+    isTaxBeforeSpread: values.isTaxBeforeSpread,
     fxMeta: values.fxMeta,
   }
 
@@ -40,7 +41,8 @@ export const encodeShareCode = (values: FormValues): string => {
  * O cálculo dentro de um código, ou `null` se o código não for um.
  *
  * O código vem de fora, então cada campo é conferido: só passa texto curto, e
- * a origem da cotação só se for uma que esta versão conhece.
+ * a origem da cotação só se for uma que esta versão conhece. Link antigo, sem
+ * a base do imposto, abre com o padrão: depois do spread.
  */
 export const decodeShareCode = (code: string): Partial<SharedValues> | null => {
   try {
@@ -59,6 +61,7 @@ export const decodeShareCode = (code: string): Partial<SharedValues> | null => {
       return null
     }
 
+    shared.isTaxBeforeSpread = data.isTaxBeforeSpread === true
     shared.fxMeta = isFxMeta(data.fxMeta) ? data.fxMeta : null
 
     return shared

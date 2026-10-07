@@ -60,7 +60,7 @@ const Result = ({ breakdown: b }: { breakdown: Breakdown }) => {
           },
           { label: t("result.afterSpread"), value: fmt.brl(b.afterSpread) },
           {
-            label: t("result.tax", { percent: fmt.percent(b.tax) }),
+            label: t(b.isTaxBeforeSpread ? "result.taxBeforeSpread" : "result.tax", { percent: fmt.percent(b.tax) }),
             value: `− ${fmt.brl(b.taxCost)}`,
             tone: "sub",
             color: COLORS.tax,
@@ -88,7 +88,7 @@ const Result = ({ breakdown: b }: { breakdown: Breakdown }) => {
             color: COLORS.spread,
           },
         ]}
-        note={t("result.note")}
+        note={t(b.isTaxBeforeSpread ? "result.noteBeforeSpread" : "result.note")}
       />
     </>
   )

@@ -1,5 +1,5 @@
-import { FX_TIMEOUT_MS } from "@/constants"
-import type { FxQuote } from "@/types"
+import { FX_TIMEOUT_MS, ONLINE_FX_SOURCES } from "@/constants"
+import type { FxProvider, FxQuote, OnlineFxSource } from "@/types"
 
 const pad = (value: number | string) => String(value).padStart(2, "0")
 
@@ -91,22 +91,37 @@ const fromFrankfurter = async (): Promise<FxQuote> => {
   return { rate, source: "frankfurter", date: toQuoteDate(data.date) }
 }
 
-/** Em ordem de preferência: a oficial primeiro, as de reserva depois. */
-const SOURCES = [fromCentralBank, fromAwesomeApi, fromFrankfurter]
+/** Cada fonte pela sua chave; a ordem da busca automática fica em `ONLINE_FX_SOURCES`. */
+const SOURCES: Record<OnlineFxSource, () => Promise<FxQuote>> = {
+  ptax: fromCentralBank,
+  awesome: fromAwesomeApi,
+  frankfurter: fromFrankfurter,
+}
 
 /**
- * A cotação de compra do dólar, da primeira fonte que responder.
+ * A cotação de compra do dólar.
  *
- * `onFallback` avisa quando uma fonte falha e a próxima vai ser tentada — é o
- * que deixa a tela dizer o que está acontecendo em vez de parecer travada.
+ * Com uma fonte escolhida, só ela é consultada. Na automática, vale a primeira
+ * que responder, na ordem de `ONLINE_FX_SOURCES`; `onFallback` recebe a
+ * próxima fonte quando uma falha — é o que deixa a tela dizer o que está
+ * acontecendo em vez de parecer travada.
  */
-export const fetchExchangeRate = async (onFallback?: () => void): Promise<FxQuote> => {
-  for (const [index, source] of SOURCES.entries()) {
+export const fetchExchangeRate = async (
+  provider: FxProvider,
+  onFallback?: (next: OnlineFxSource) => void,
+): Promise<FxQuote> => {
+  if (provider !== "auto") {
+    return SOURCES[provider]()
+  }
+
+  for (const [index, source] of ONLINE_FX_SOURCES.entries()) {
     try {
-      return await source()
+      return await SOURCES[source]()
     } catch {
-      if (index < SOURCES.length - 1) {
-        onFallback?.()
+      const next = ONLINE_FX_SOURCES[index + 1]
+
+      if (next) {
+        onFallback?.(next)
       }
     }
   }
