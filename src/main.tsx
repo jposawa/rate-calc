@@ -6,6 +6,8 @@ import { createRoot } from "react-dom/client"
 // `.module.css` daqui usam, não dependerem de a página usar um componente dela.
 import "@jposawa/ronin-ui/styles.css"
 
+import { I18nProvider } from "@/i18n"
+
 import { App } from "./App"
 // Depois da biblioteca e fora de `@layer`: é o que faz as cores deste projeto
 // vencerem os padrões dela.
@@ -13,6 +15,8 @@ import "./styles/global.css"
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <I18nProvider>
+      <App />
+    </I18nProvider>
   </StrictMode>,
 )

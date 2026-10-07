@@ -1,6 +1,13 @@
-import type { FormValues, SimplesBand } from "@/types"
+import type { FormValues, FxSource, Locale, SimplesBand } from "@/types"
 
 export const STORAGE_KEY = "rate-calc:v1"
+
+export const LOCALE_KEY = "rate-calc:locale"
+
+/** O parâmetro da URL que leva um cálculo compartilhado: `?share=<código>`. */
+export const SHARE_PARAM = "share"
+
+export const FX_SOURCES: FxSource[] = ["manual", "ptax", "awesome", "frankfurter"]
 
 /** Espera entre a última tecla e a gravação, para não escrever a cada caractere. */
 export const SAVE_DELAY_MS = 400
@@ -8,7 +15,7 @@ export const SAVE_DELAY_MS = 400
 /** Cada fonte de cotação tem esse tempo antes de passar para a próxima. */
 export const FX_TIMEOUT_MS = 7000
 
-export const DEFAULT_VALUES: FormValues = {
+const BASE_VALUES: FormValues = {
   rate: "",
   hours: "160",
   fx: "5,00",
@@ -16,7 +23,13 @@ export const DEFAULT_VALUES: FormValues = {
   tax: "6",
   rbt12: "",
   isExport: false,
-  fxMeta: { source: "Referência manual", date: "07/10/2026" },
+  fxMeta: { source: "manual", date: "2026-10-07" },
+}
+
+/** Os mesmos padrões, com o separador decimal de cada idioma. */
+export const DEFAULT_VALUES: Record<Locale, FormValues> = {
+  "pt-BR": BASE_VALUES,
+  en: { ...BASE_VALUES, fx: "5.00", spread: "0.5" },
 }
 
 /**

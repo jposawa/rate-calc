@@ -1,6 +1,7 @@
 import { Button, Popover, type BaseComponent } from "@jposawa/ronin-ui"
-import clsx from "clsx"
 import { useRef, useState } from "react"
+
+import { useTranslation } from "@/hooks"
 
 import styles from "./ClearDataButton.module.css"
 
@@ -16,16 +17,17 @@ type ClearDataButtonProps = BaseComponent & {
  *
  * O foco volta para o botão ao fechar, por qualquer caminho. O Escape a
  * biblioteca já devolve; o Cancelar e o Apagar desmontam o painel com o foco
- * dentro dele, e sem isto o foco cairia no `body`.
+ * dentro dele, e sem isto o foco cairia no `body`. O botão é guardado no
+ * clique que abre o painel — o `Button` da biblioteca não aceita `ref`.
  */
 export const ClearDataButton = ({ onConfirm, className, style }: ClearDataButtonProps) => {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
-  const wrapperRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
 
   const close = () => {
     setIsOpen(false)
-    // O primeiro botão do wrapper é o gatilho; o painel vem depois dele.
-    wrapperRef.current?.querySelector("button")?.focus()
+    triggerRef.current?.focus()
   }
 
   const confirm = () => {
@@ -34,30 +36,35 @@ export const ClearDataButton = ({ onConfirm, className, style }: ClearDataButton
   }
 
   return (
-    <div ref={wrapperRef} className={clsx(styles.wrapper, className)} style={style}>
-      <Popover
-        title="Apagar dados salvos?"
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        placement="top-start"
-        trigger={
-          <Button variant="outline" intent="danger" onClick={() => setIsOpen((open) => !open)}>
-            Apagar dados salvos
-          </Button>
-        }
-      >
-        <p className={styles.message}>
-          O que foi salvo neste navegador é apagado e os campos voltam aos valores padrão.
-        </p>
-        <div className={styles.actions}>
-          <Button variant="outline" intent="neutral" onClick={close}>
-            Cancelar
-          </Button>
-          <Button variant="filled" intent="danger" onClick={confirm}>
-            Apagar
-          </Button>
-        </div>
-      </Popover>
-    </div>
+    <Popover
+      title={t("clear.title")}
+      isOpen={isOpen}
+      onClose={() => setIsOpen(false)}
+      placement="top-start"
+      trigger={
+        <Button
+          className={className}
+          style={style}
+          variant="outline"
+          intent="danger"
+          onClick={(event) => {
+            triggerRef.current = event.currentTarget
+            setIsOpen((open) => !open)
+          }}
+        >
+          {t("clear.button")}
+        </Button>
+      }
+    >
+      <p className={styles.message}>{t("clear.message")}</p>
+      <div className={styles.actions}>
+        <Button variant="outline" intent="neutral" onClick={close}>
+          {t("clear.cancel")}
+        </Button>
+        <Button variant="filled" intent="danger" onClick={confirm}>
+          {t("clear.confirm")}
+        </Button>
+      </div>
+    </Popover>
   )
 }

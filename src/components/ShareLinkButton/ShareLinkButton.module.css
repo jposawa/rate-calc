@@ -1,0 +1,17 @@
+/* Ocupa o rodapé inteiro do card, com tudo alinhado à direita. A largura não
+   depende da mensagem, então ela aparecer embaixo não tira o botão do lugar. */
+.share {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+/* Vazio continua no DOM, pelo mesmo motivo do status da cotação: uma região
+   `role="status"` fora da árvore de acessibilidade pode não anunciar nada. */
+.status {
+  font-size: var(--text-sm);
+  text-align: right;
+  color: var(--color-text-muted);
+}

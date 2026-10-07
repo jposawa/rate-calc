@@ -1,0 +1,86 @@
+import type { Messages } from "@/types"
+
+export const en: Messages = {
+  "locale.label": "Language",
+
+  "home.title": "From a US$ hourly rate to net income in reais",
+  "home.intro":
+    "Enter your hourly rate and the hours in the month. The calculation takes out the exchange spread first and then the invoice tax. Values are saved in this browser.",
+
+  "field.rate.label": "Hourly rate in US$",
+  "field.rate.placeholder": "45.00",
+  "field.hours.label": "Hours in the month",
+  "field.spread.label": "Spread in % (optional)",
+  "field.spread.hint": "Default: 0.5%. Empty counts as 0%.",
+  "field.spread.placeholder": "0.5",
+  "field.tax.label": "Invoice tax in % (optional)",
+  "field.tax.hint": "Default: 6%, Simples Nacional, Annex III, 1st bracket.",
+
+  "validation.ratePositive": "The hourly rate must be a number greater than zero.",
+  "validation.hoursPositive": "Hours must be a number greater than zero.",
+  "validation.fxPositive": "The exchange rate must be a number greater than zero.",
+  "validation.percentRange": "Use a percentage between 0 and 100.",
+
+  "fx.label": "US dollar rate in R$",
+  "fx.placeholder": "4.9850",
+  "fx.sourceHint": "{source}, {date}. Estimate; your platform's rate may differ.",
+  "fx.manual": "Entered manually.",
+  "fx.source.manual": "Manual reference",
+  "fx.source.ptax": "PTAX buy rate, Central Bank of Brazil",
+  "fx.source.awesome": "Commercial buy rate, AwesomeAPI",
+  "fx.source.frankfurter": "ECB reference, Frankfurter",
+  "fx.fetch": "Fetch rate",
+  "fx.fetching": "Fetching…",
+  "fx.status.querying": "Checking the Central Bank of Brazil…",
+  "fx.status.fallback": "Source unavailable, trying the next one…",
+  "fx.status.failed": "Couldn't fetch the rate right now. Enter it manually.",
+
+  "simples.title": "Calculate the Annex III tax rate",
+  "simples.rbt12.label": "Gross revenue over the last 12 months in R$",
+  "simples.rbt12.hint": "Used to find the bracket and the effective rate.",
+  "simples.rbt12.placeholder": "250000.00",
+  "simples.export": "Service export (removes PIS, COFINS and ISS from the rate)",
+  "simples.empty": "Enter the gross revenue to calculate.",
+  "simples.invalid": "Gross revenue must be a number.",
+  "simples.aboveLimit": "Above R$ 1.8 million. Enter the rate manually in the tax field.",
+  "simples.band": "Bracket {band}.",
+  "simples.effective": "Effective rate:",
+  "simples.exportRate": "Without PIS, COFINS and ISS:",
+  "simples.apply": "Use this rate",
+  "simples.note":
+    "Covers brackets 1 to 4 (up to R$ 1.8 million) and assumes the Fator R keeps you in Annex III. Check with your accountant.",
+
+  "result.title": "Monthly result",
+  "result.empty": "Fill in the hourly rate, hours and exchange rate to see the result.",
+  "result.totalUsd": "Total in USD",
+  "result.gross": "Converted without spread (× {fx})",
+  "result.spread": "Spread ({percent}%)",
+  "result.afterSpread": "BRL after spread",
+  "result.tax": "Invoice tax ({percent}%)",
+  "result.net": "BRL after tax",
+  "result.perHour": "{amount} per hour, net.",
+  "result.netShort": "net",
+  "result.splitDescription": "of the amount converted without spread",
+  "result.part.net": "Net",
+  "result.part.tax": "Tax",
+  "result.part.spread": "Spread",
+  "result.note":
+    "Percentages of the amount converted without spread. Tax applies to the converted amount, after the spread.",
+
+  "share.button": "Copy link",
+  "share.copied": "Link copied. Anyone who opens it sees this same calculation.",
+  "share.failed": "Couldn't copy. The link is in the address bar.",
+
+  "clear.button": "Clear saved data",
+  "clear.title": "Clear saved data?",
+  "clear.message": "What was saved in this browser is deleted and the fields go back to their defaults.",
+  "clear.cancel": "Cancel",
+  "clear.confirm": "Clear",
+
+  "status.restored": "Values from your last visit, saved on {date}.",
+  "status.restoredNoDate": "Values from your last visit restored.",
+  "status.saved": "Saved in this browser on {date}.",
+  "status.saveFailed": "Couldn't save in this browser. Values only last for this session.",
+  "status.cleared": "Saved data cleared. Defaults restored.",
+  "status.shared": "Values opened from a shared link. They'll be saved in this browser once you change any field.",
+}

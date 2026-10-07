@@ -6,8 +6,11 @@
  * iria procurar o Button nesta pasta e não o acharia.
  */
 export * from "./ClearDataButton"
+export * from "./DecimalInput"
 export * from "./ExchangeRateField"
 export * from "./Ledger"
+export * from "./LocaleSwitch"
 export * from "./ResultSummary"
+export * from "./ShareLinkButton"
 export * from "./SplitDonut"
 export * from "./TaxRateHelper"

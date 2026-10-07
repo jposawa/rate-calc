@@ -1,6 +1,6 @@
 import { Card, type BaseComponent } from "@jposawa/ronin-ui"
 
-import { formatBRL, formatPercent, formatUSD } from "@/helpers"
+import { useTranslation } from "@/hooks"
 import type { Breakdown } from "@/types"
 
 import { Ledger } from "../Ledger"
@@ -11,6 +11,8 @@ import styles from "./ResultSummary.module.css"
 type ResultSummaryProps = BaseComponent & {
   /** `null` enquanto o formulário estiver incompleto ou com erro. */
   breakdown: Breakdown | null
+  /** Vai no rodapé do card, e só quando há resultado. */
+  actions?: React.ReactNode
 }
 
 const COLORS = {
@@ -20,19 +22,25 @@ const COLORS = {
 }
 
 /** O mês calculado: a conta passo a passo, o líquido em destaque e para onde foi cada parte. */
-export const ResultSummary = ({ breakdown, className, style }: ResultSummaryProps) => (
-  <Card className={className} style={style} header={<h2 className={styles.title}>Resultado do mês</h2>}>
-    <div aria-live="polite">
-      {breakdown ? (
-        <Result breakdown={breakdown} />
-      ) : (
-        <p className={styles.empty}>Preencha valor/hora, horas e cotação para ver o resultado.</p>
-      )}
-    </div>
-  </Card>
-)
+export const ResultSummary = ({ breakdown, actions, className, style }: ResultSummaryProps) => {
+  const { t } = useTranslation()
+
+  return (
+    <Card
+      className={className}
+      style={style}
+      header={<h2 className={styles.title}>{t("result.title")}</h2>}
+      footer={breakdown && actions}
+    >
+      <div className={styles.body} aria-live="polite">
+        {breakdown ? <Result breakdown={breakdown} /> : <p className={styles.empty}>{t("result.empty")}</p>}
+      </div>
+    </Card>
+  )
+}
 
 const Result = ({ breakdown: b }: { breakdown: Breakdown }) => {
+  const { t, fmt } = useTranslation()
   // Percentuais sobre o convertido sem spread: é o "todo" que o spread e o
   // imposto dividem com o líquido, e as três fatias somam 100.
   const share = (amount: number) => (amount / b.gross) * 100
@@ -42,40 +50,45 @@ const Result = ({ breakdown: b }: { breakdown: Breakdown }) => {
     <>
       <Ledger
         lines={[
-          { label: "Total em USD", value: formatUSD(b.usd) },
-          { label: `Convertido sem spread (× ${formatBRL(b.fx)})`, value: formatBRL(b.gross), tone: "sub" },
+          { label: t("result.totalUsd"), value: fmt.usd(b.usd) },
+          { label: t("result.gross", { fx: fmt.brl(b.fx) }), value: fmt.brl(b.gross), tone: "sub" },
           {
-            label: `Spread (${formatPercent(b.spread)}%)`,
-            value: `− ${formatBRL(b.spreadCost)}`,
+            label: t("result.spread", { percent: fmt.percent(b.spread) }),
+            value: `− ${fmt.brl(b.spreadCost)}`,
             tone: "sub",
             color: COLORS.spread,
           },
-          { label: "BRL pós spread", value: formatBRL(b.afterSpread) },
+          { label: t("result.afterSpread"), value: fmt.brl(b.afterSpread) },
           {
-            label: `Imposto da nota (${formatPercent(b.tax)}%)`,
-            value: `− ${formatBRL(b.taxCost)}`,
+            label: t("result.tax", { percent: fmt.percent(b.tax) }),
+            value: `− ${fmt.brl(b.taxCost)}`,
             tone: "sub",
             color: COLORS.tax,
           },
         ]}
       />
 
-      <div className={styles.net}>
-        <p className={styles.netLabel}>BRL pós imposto</p>
-        <p className={styles.netValue}>{formatBRL(b.net)}</p>
-        <p className={styles.perHour}>{formatBRL(b.netPerHour)} por hora, líquido.</p>
-      </div>
+      <p className={styles.netTotal}>
+        <span className={styles.netLabel}>{t("result.net")}</span>
+        <strong className={styles.netValue}>{fmt.brl(b.net)}</strong>
+        <span className={styles.perHour}>{t("result.perHour", { amount: fmt.brl(b.netPerHour) })}</span>
+      </p>
 
       <SplitDonut
-        className={styles.split}
-        center={{ value: `${formatPercent(netShare, 1)}%`, label: "líquido" }}
-        description="do valor convertido sem spread"
+        className={styles.chart}
+        center={{ value: `${fmt.percent(netShare, 1)}%`, label: t("result.netShort") }}
+        description={t("result.splitDescription")}
         parts={[
-          { label: "Líquido", percent: netShare, amount: formatBRL(b.net), color: COLORS.net },
-          { label: "Imposto", percent: share(b.taxCost), amount: formatBRL(b.taxCost), color: COLORS.tax },
-          { label: "Spread", percent: share(b.spreadCost), amount: formatBRL(b.spreadCost), color: COLORS.spread },
+          { label: t("result.part.net"), percent: netShare, amount: fmt.brl(b.net), color: COLORS.net },
+          { label: t("result.part.tax"), percent: share(b.taxCost), amount: fmt.brl(b.taxCost), color: COLORS.tax },
+          {
+            label: t("result.part.spread"),
+            percent: share(b.spreadCost),
+            amount: fmt.brl(b.spreadCost),
+            color: COLORS.spread,
+          },
         ]}
-        note="Percentuais sobre o valor convertido sem spread. O imposto incide sobre o valor já convertido, após o spread."
+        note={t("result.note")}
       />
     </>
   )

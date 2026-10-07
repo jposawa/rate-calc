@@ -1,8 +1,10 @@
-import { Button, Checkbox, Collapse, Input, type BaseComponent } from "@jposawa/ronin-ui"
+import { Button, Checkbox, Collapse, type BaseComponent } from "@jposawa/ronin-ui"
 import { useState } from "react"
 
-import { computeSimplesRate, formatPercent } from "@/helpers"
-import type { SimplesResult } from "@/types"
+import { computeSimplesRate } from "@/helpers"
+import { useTranslation } from "@/hooks"
+
+import { DecimalInput } from "../DecimalInput"
 
 import styles from "./TaxRateHelper.module.css"
 
@@ -13,29 +15,6 @@ type TaxRateHelperProps = BaseComponent & {
   onExportChange: (isExport: boolean) => void
   /** Recebe a alíquota final, em %. */
   onApply: (rate: number) => void
-}
-
-const describeResult = (result: SimplesResult, isExport: boolean): React.ReactNode => {
-  switch (result.kind) {
-    case "empty":
-      return "Informe a receita bruta para calcular."
-    case "invalid":
-      return "A receita bruta precisa ser um número."
-    case "aboveLimit":
-      return "Acima de R$ 1,8 milhão. Informe a alíquota manualmente no campo de imposto."
-    case "ok":
-      return (
-        <>
-          Faixa {result.band}. Alíquota efetiva: <strong>{formatPercent(result.effectiveRate)}%</strong>.
-          {isExport && (
-            <>
-              {" "}
-              Sem PIS, COFINS e ISS: <strong>{formatPercent(result.finalRate)}%</strong>.
-            </>
-          )}
-        </>
-      )
-  }
 }
 
 /**
@@ -53,53 +32,71 @@ export const TaxRateHelper = ({
   className,
   style,
 }: TaxRateHelperProps) => {
+  const { t, fmt } = useTranslation()
   const [isOpen, setIsOpen] = useState(() => rbt12 !== "" || isExport)
   const result = computeSimplesRate(rbt12, isExport)
+
+  const describeResult = (): React.ReactNode => {
+    switch (result.kind) {
+      case "empty":
+        return t("simples.empty")
+      case "invalid":
+        return t("simples.invalid")
+      case "aboveLimit":
+        return t("simples.aboveLimit")
+      case "ok":
+        return (
+          <>
+            {t("simples.band", { band: result.band })} {t("simples.effective")}{" "}
+            <strong>{fmt.percent(result.effectiveRate)}%</strong>.
+            {isExport && (
+              <>
+                {" "}
+                {t("simples.exportRate")} <strong>{fmt.percent(result.finalRate)}%</strong>.
+              </>
+            )}
+          </>
+        )
+    }
+  }
 
   return (
     <Collapse
       className={className}
       style={style}
-      title="Calcular a alíquota do Anexo III"
+      title={t("simples.title")}
       isOpen={isOpen}
       onToggle={() => setIsOpen((open) => !open)}
     >
-      <div className={styles.body}>
-        <Input
-          label="Receita bruta dos últimos 12 meses em R$"
+      {/* `fieldset`: são os controles de um mesmo cálculo, dentro do formulário. */}
+      <fieldset className={styles.body}>
+        <DecimalInput
+          decimals={2}
+          label={t("simples.rbt12.label")}
           value={rbt12}
           onValueChange={onRbt12Change}
-          hint="Usada para definir a faixa e a alíquota efetiva."
-          inputMode="decimal"
-          placeholder="250000"
+          hint={t("simples.rbt12.hint")}
+          placeholder={t("simples.rbt12.placeholder")}
         />
 
-        <Checkbox
-          label="Exportação de serviço (exclui PIS, COFINS e ISS da alíquota)"
-          checked={isExport}
-          onCheckedChange={onExportChange}
-        />
+        <Checkbox label={t("simples.export")} checked={isExport} onCheckedChange={onExportChange} />
 
         <p className={styles.output} aria-live="polite">
-          {describeResult(result, isExport)}
+          {describeResult()}
         </p>
 
-        <div>
-          <Button
-            variant="outline"
-            intent="primary"
-            disabled={result.kind !== "ok"}
-            onClick={() => result.kind === "ok" && onApply(result.finalRate)}
-          >
-            Usar esta alíquota
-          </Button>
-        </div>
+        <Button
+          className={styles.apply}
+          variant="outline"
+          intent="primary"
+          disabled={result.kind !== "ok"}
+          onClick={() => result.kind === "ok" && onApply(result.finalRate)}
+        >
+          {t("simples.apply")}
+        </Button>
 
-        <p className={styles.note}>
-          Considera as faixas 1 a 4 (até R$ 1,8 milhão) e assume que o Fator R mantém você no Anexo III.
-          Confirme com seu contador.
-        </p>
-      </div>
+        <p className={styles.note}>{t("simples.note")}</p>
+      </fieldset>
     </Collapse>
   )
 }

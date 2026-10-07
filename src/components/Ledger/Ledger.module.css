@@ -1,50 +1,53 @@
+/* Rótulo e valor são as duas colunas; cada par de células é uma linha. O
+   traço vai nas duas células, e o afastamento entre elas é o `padding` do
+   valor — um `column-gap` cortaria o traço. */
 .ledger {
-  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
-.line {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-2) 0;
+.label,
+.value {
+  padding-block: var(--space-2);
   border-bottom: var(--border-width) solid var(--color-border);
 }
 
 .label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   color: var(--color-text-muted);
 }
 
 .value {
-  margin: 0;
+  padding-left: var(--space-4);
   font-weight: 500;
   text-align: right;
   white-space: nowrap;
 }
 
-.line[data-tone="key"] .label {
+.label[data-tone="key"] {
   font-weight: 600;
   color: var(--color-text-strong);
 }
 
-.line[data-tone="key"] .value {
+.value[data-tone="key"] {
   font-weight: 600;
 }
 
-.line[data-tone="sub"] {
+.label[data-tone="sub"],
+.value[data-tone="sub"] {
   font-size: 0.9375rem;
 }
 
-.line[data-tone="sub"] .value {
+.value[data-tone="sub"] {
   font-weight: 400;
   color: var(--color-text-muted);
 }
 
-.swatch {
-  display: inline-block;
+.colorDot {
+  flex-shrink: 0;
   width: 0.625rem;
   height: 0.625rem;
-  margin-right: var(--space-2);
-  vertical-align: 0.05em;
   border-radius: 2px;
 }

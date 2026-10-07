@@ -1,12 +1,8 @@
-.wrapper {
-  display: inline-block;
-}
-
 .message {
-  margin: 0;
   font-size: var(--text-sm);
 }
 
+/* Cancelar e Apagar lado a lado, à direita do painel. */
 .actions {
   display: flex;
   flex-wrap: wrap;

@@ -34,16 +34,16 @@ export const parseNumber = (raw: string): number => {
 }
 
 /**
- * Como `parseNumber`, mas "250.000" é milhar e não decimal.
+ * Como `parseNumber`, mas "250.000" e "250,000" são milhar e não decimal.
  *
  * Para valores em reais grandes, como a receita bruta, ninguém escreve
- * "250.000" querendo dizer duzentos e cinquenta.
+ * "250.000" — nem, em inglês, "250,000" — querendo dizer duzentos e cinquenta.
  */
 export const parseAmount = (raw: string): number => {
   const text = raw.trim()
 
-  if (/^\d{1,3}(\.\d{3})+$/.test(text)) {
-    return Number(text.replace(/\./g, ""))
+  if (/^\d{1,3}([.,]\d{3})+$/.test(text) && !(text.includes(".") && text.includes(","))) {
+    return Number(text.replace(/[.,]/g, ""))
   }
 
   return parseNumber(text)

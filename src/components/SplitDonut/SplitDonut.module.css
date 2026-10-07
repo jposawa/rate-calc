@@ -1,14 +1,22 @@
-.split {
+/* Rosca e legenda lado a lado; a nota embaixo, na largura toda. */
+.chart {
   display: grid;
   grid-template-columns: 9.5rem minmax(0, 1fr);
   gap: var(--space-4) 1.25rem;
   align-items: center;
 }
 
+/* Anel e texto do meio empilhados na mesma célula da grade. */
 .donut {
-  position: relative;
+  display: grid;
+  place-items: center;
   width: 9.5rem;
   aspect-ratio: 1;
+}
+
+.ring,
+.centerText {
+  grid-area: 1 / 1;
 }
 
 /* Começa no topo, às 12h, em vez das 3h onde o SVG começa o traço. */
@@ -27,13 +35,10 @@
     stroke-dashoffset 260ms ease;
 }
 
-.center {
-  position: absolute;
-  inset: 0;
+.centerText {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   line-height: 1.15;
   text-align: center;
 }
@@ -50,22 +55,22 @@
 }
 
 .legend {
-  margin: 0;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
   font-size: 0.9375rem;
   list-style: none;
 }
 
-.item {
+/* Cor, nome e percentual na primeira linha; o valor embaixo do nome. */
+.legendItem {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: var(--space-1) var(--space-2);
+  gap: 0 var(--space-2);
   align-items: baseline;
-  padding: 0.3rem 0;
 }
 
-.swatch {
-  display: inline-block;
+.colorDot {
   align-self: center;
   width: 0.625rem;
   height: 0.625rem;
@@ -79,20 +84,18 @@
 
 .amount {
   grid-column: 2 / 4;
-  margin-top: -0.2rem;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
 .note {
   grid-column: 1 / -1;
-  margin: 0;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
 @media (max-width: 24rem) {
-  .split {
+  .chart {
     grid-template-columns: 1fr;
     justify-items: center;
   }

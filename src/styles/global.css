@@ -74,3 +74,26 @@ body {
 *::after {
   box-sizing: border-box;
 }
+
+/* Sem margem de fábrica: o espaço entre os elementos é do container que os
+   arruma — `gap` num flex ou grid —, não de cada filho. */
+h1,
+h2,
+p,
+ul,
+dl,
+dd,
+figure,
+fieldset {
+  margin: 0;
+}
+
+ul,
+fieldset {
+  padding: 0;
+}
+
+fieldset {
+  min-inline-size: 0;
+  border: 0;
+}

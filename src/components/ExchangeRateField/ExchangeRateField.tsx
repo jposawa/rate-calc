@@ -1,9 +1,12 @@
-import { Button, Input, type BaseComponent } from "@jposawa/ronin-ui"
+import { Button, type BaseComponent } from "@jposawa/ronin-ui"
 import clsx from "clsx"
 import { useState } from "react"
 
+import { useTranslation } from "@/hooks"
 import { fetchExchangeRate } from "@/services"
-import type { FxMeta, FxQuote } from "@/types"
+import type { FxMeta, FxQuote, MessageKey } from "@/types"
+
+import { DecimalInput } from "../DecimalInput"
 
 import styles from "./ExchangeRateField.module.css"
 
@@ -16,17 +19,14 @@ type ExchangeRateFieldProps = BaseComponent & {
   onQuote: (quote: FxQuote) => void
 }
 
-const describeSource = (meta: FxMeta | null) =>
-  meta
-    ? `${meta.source}, ${meta.date}. Estimativa; a taxa da sua plataforma pode diferir.`
-    : "Valor informado manualmente."
-
 /**
  * O campo da cotação, com o botão que a busca na internet.
  *
  * A origem do valor fica no `hint` do campo — ligada a ele por
  * `aria-describedby` — e o andamento da busca numa linha `role="status"` à
  * parte, para ser anunciado sem a pessoa precisar voltar ao campo.
+ *
+ * Quatro casas, como as cotações que as fontes devolvem.
  */
 export const ExchangeRateField = ({
   value,
@@ -37,43 +37,46 @@ export const ExchangeRateField = ({
   className,
   style,
 }: ExchangeRateFieldProps) => {
+  const { t, fmt } = useTranslation()
   const [isFetching, setIsFetching] = useState(false)
-  const [status, setStatus] = useState("")
+  const [status, setStatus] = useState<MessageKey | null>(null)
 
   const handleFetch = async () => {
     setIsFetching(true)
-    setStatus("Consultando o Banco Central…")
+    setStatus("fx.status.querying")
 
     try {
-      onQuote(await fetchExchangeRate(() => setStatus("Fonte indisponível, tentando a próxima…")))
-      setStatus("")
+      onQuote(await fetchExchangeRate(() => setStatus("fx.status.fallback")))
+      setStatus(null)
     } catch {
-      setStatus("Não foi possível buscar a cotação agora. Informe o valor manualmente.")
+      setStatus("fx.status.failed")
     } finally {
       setIsFetching(false)
     }
   }
 
+  const hint = meta
+    ? t("fx.sourceHint", { source: t(`fx.source.${meta.source}`), date: fmt.quoteDate(meta.date) })
+    : t("fx.manual")
+
   return (
     <div className={clsx(styles.field, className)} style={style}>
-      <Input
-        label="Cotação do dólar em R$"
+      <DecimalInput
+        className={styles.input}
+        decimals={4}
+        label={t("fx.label")}
         value={value}
         onValueChange={onValueChange}
-        hint={describeSource(meta)}
+        hint={hint}
         errorMessage={errorMessage}
-        inputMode="decimal"
-        placeholder="4,98"
+        placeholder={t("fx.placeholder")}
       />
-
-      <div className={styles.actions}>
-        <Button variant="outline" intent="primary" onClick={handleFetch} disabled={isFetching}>
-          {isFetching ? "Buscando…" : "Buscar cotação"}
-        </Button>
-        <p className={styles.status} role="status">
-          {status}
-        </p>
-      </div>
+      <Button variant="outline" intent="primary" onClick={handleFetch} disabled={isFetching}>
+        {isFetching ? t("fx.fetching") : t("fx.fetch")}
+      </Button>
+      <p className={styles.status} role="status">
+        {status && t(status)}
+      </p>
     </div>
   )
 }

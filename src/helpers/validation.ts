@@ -1,4 +1,5 @@
-import type { BreakdownInput, FieldErrors, FormValues } from "@/types"
+import { FX_SOURCES } from "@/constants"
+import type { BreakdownInput, FieldErrors, FormValues, FxMeta } from "@/types"
 
 import { parseNumber } from "./number"
 
@@ -9,9 +10,9 @@ type Validation = {
 }
 
 const REQUIRED = [
-  { field: "rate", label: "O valor/hora" },
-  { field: "hours", label: "As horas" },
-  { field: "fx", label: "A cotação" },
+  { field: "rate", error: "validation.ratePositive" },
+  { field: "hours", error: "validation.hoursPositive" },
+  { field: "fx", error: "validation.fxPositive" },
 ] as const
 
 /** Vazio conta como 0%: são os dois campos opcionais. */
@@ -28,14 +29,14 @@ export const validateValues = (values: FormValues): Validation => {
   const numbers = {} as BreakdownInput
   let isComplete = true
 
-  for (const { field, label } of REQUIRED) {
+  for (const { field, error } of REQUIRED) {
     const value = parseNumber(values[field])
     numbers[field] = value
 
     if (values[field].trim() === "") {
       isComplete = false
     } else if (!(value > 0)) {
-      errors[field] = `${label} precisa ser um número maior que zero.`
+      errors[field] = error
     }
   }
 
@@ -44,11 +45,26 @@ export const validateValues = (values: FormValues): Validation => {
     numbers[field] = value
 
     if (!(value >= 0 && value < 100)) {
-      errors[field] = "Use um percentual entre 0 e 100."
+      errors[field] = "validation.percentRange"
     }
   }
 
   const hasErrors = Object.keys(errors).length > 0
 
   return { errors, input: isComplete && !hasErrors ? numbers : null }
+}
+
+/**
+ * Se o que veio de fora — do armazenamento ou de um link — é uma origem de
+ * cotação que esta versão entende. Gravações antigas tinham o nome da fonte
+ * em texto; essas não passam, e o campo fica como "informado manualmente".
+ */
+export const isFxMeta = (value: unknown): value is FxMeta => {
+  const meta = value as Partial<FxMeta> | null
+
+  return (
+    typeof meta?.date === "string" &&
+    typeof meta.source === "string" &&
+    FX_SOURCES.includes(meta.source)
+  )
 }

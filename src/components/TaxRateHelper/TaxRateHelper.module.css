@@ -5,7 +5,6 @@
 }
 
 .output {
-  margin: 0;
   font-size: 0.9375rem;
 }
 
@@ -14,8 +13,12 @@
   color: var(--color-text-strong);
 }
 
+/* Na largura do texto, não da coluna. */
+.apply {
+  align-self: flex-start;
+}
+
 .note {
-  margin: 0;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }

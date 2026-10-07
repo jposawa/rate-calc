@@ -1,7 +1,7 @@
 import type { BaseComponent } from "@jposawa/ronin-ui"
 import clsx from "clsx"
 
-import { formatPercent } from "@/helpers"
+import { useTranslation } from "@/hooks"
 
 import styles from "./SplitDonut.module.css"
 
@@ -38,13 +38,14 @@ const RADIUS = 15.9155
  * escuro sem precisar redesenhar.
  */
 export const SplitDonut = ({ parts, center, description, note, className, style }: SplitDonutProps) => {
+  const { fmt } = useTranslation()
   const offsets = parts.map((_, index) =>
     parts.slice(0, index).reduce((sum, part) => sum + Math.max(0, part.percent), 0),
   )
-  const accessibleName = `${parts.map((part) => `${part.label} ${formatPercent(part.percent, 2)}%`).join(", ")} ${description}`
+  const accessibleName = `${parts.map((part) => `${part.label} ${fmt.percent(part.percent, 2)}%`).join(", ")} ${description}`
 
   return (
-    <div className={clsx(styles.split, className)} style={style}>
+    <figure className={clsx(styles.chart, className)} style={style}>
       <div className={styles.donut} role="img" aria-label={accessibleName}>
         <svg className={styles.ring} viewBox="0 0 42 42" aria-hidden="true">
           <circle className={styles.slice} cx="21" cy="21" r={RADIUS} style={{ stroke: "var(--color-border)" }} />
@@ -65,24 +66,24 @@ export const SplitDonut = ({ parts, center, description, note, className, style 
             )
           })}
         </svg>
-        <div className={styles.center}>
+        <p className={styles.centerText}>
           <strong className={styles.centerValue}>{center.value}</strong>
           <span className={styles.centerLabel}>{center.label}</span>
-        </div>
+        </p>
       </div>
 
       <ul className={styles.legend}>
         {parts.map((part) => (
-          <li key={part.label} className={styles.item}>
-            <span className={styles.swatch} style={{ background: part.color }} aria-hidden="true" />
+          <li key={part.label} className={styles.legendItem}>
+            <span className={styles.colorDot} style={{ background: part.color }} aria-hidden="true" />
             <span>{part.label}</span>
-            <span className={styles.percent}>{formatPercent(part.percent, 2)}%</span>
+            <span className={styles.percent}>{fmt.percent(part.percent, 2)}%</span>
             <span className={styles.amount}>{part.amount}</span>
           </li>
         ))}
       </ul>
 
-      {note && <p className={styles.note}>{note}</p>}
-    </div>
+      {note && <figcaption className={styles.note}>{note}</figcaption>}
+    </figure>
   )
 }

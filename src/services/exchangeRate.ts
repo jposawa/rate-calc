@@ -3,8 +3,8 @@ import type { FxQuote } from "@/types"
 
 const pad = (value: number | string) => String(value).padStart(2, "0")
 
-/** "2026-10-07 13:05:12" → "07/10/2026 13:05". Sem hora, só a data. */
-const toBrazilianDate = (raw: string): string => {
+/** "2026-10-07 13:05:12" → "2026-10-07 13:05", o formato de `FxMeta.date`. Sem hora, só a data. */
+const toQuoteDate = (raw: string): string => {
   const match = /^(\d{4})-(\d{2})-(\d{2})(?:[\sT](\d{2}):(\d{2}))?/.exec(raw)
 
   if (!match) {
@@ -12,7 +12,7 @@ const toBrazilianDate = (raw: string): string => {
   }
 
   const [, year, month, day, hour, minute] = match
-  const date = `${day}/${month}/${year}`
+  const date = `${year}-${month}-${day}`
 
   return hour ? `${date} ${hour}:${minute}` : date
 }
@@ -54,8 +54,8 @@ const fromCentralBank = async (): Promise<FxQuote> => {
 
   return {
     rate: quote.cotacaoCompra,
-    source: "PTAX compra, Banco Central",
-    date: toBrazilianDate(quote.dataHoraCotacao),
+    source: "ptax",
+    date: toQuoteDate(quote.dataHoraCotacao),
   }
 }
 
@@ -72,8 +72,8 @@ const fromAwesomeApi = async (): Promise<FxQuote> => {
 
   return {
     rate,
-    source: "Comercial compra, AwesomeAPI",
-    date: toBrazilianDate(data.USDBRL.create_date),
+    source: "awesome",
+    date: toQuoteDate(data.USDBRL.create_date),
   }
 }
 
@@ -88,7 +88,7 @@ const fromFrankfurter = async (): Promise<FxQuote> => {
     throw new Error("sem dados")
   }
 
-  return { rate, source: "Referência BCE, Frankfurter", date: toBrazilianDate(data.date) }
+  return { rate, source: "frankfurter", date: toQuoteDate(data.date) }
 }
 
 /** Em ordem de preferência: a oficial primeiro, as de reserva depois. */

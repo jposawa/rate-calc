@@ -1,26 +1,31 @@
 .title {
-  margin: 0;
   font-size: 1.0625rem;
   font-weight: 600;
 }
 
+/* Conta, líquido e gráfico empilhados; o espaço entre eles é daqui. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
 .empty {
-  margin: 0;
   color: var(--color-text-muted);
 }
 
-.net {
-  padding: 1.25rem 0 var(--space-2);
+.netTotal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .netLabel {
-  margin: 0;
   font-weight: 600;
   color: var(--color-text-strong);
 }
 
 .netValue {
-  margin: 0.125rem 0 var(--space-1);
   font-size: clamp(2rem, 1.5rem + 2.2vw, 2.75rem);
   font-weight: 700;
   line-height: 1.1;
@@ -30,13 +35,12 @@
 }
 
 .perHour {
-  margin: 0;
   font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
-.split {
-  margin-top: 1.25rem;
+/* O traço que separa o gráfico da conta; o espaço até ele é o `gap` de cima. */
+.chart {
   padding-top: 1.25rem;
   border-top: var(--border-width) solid var(--color-border);
 }

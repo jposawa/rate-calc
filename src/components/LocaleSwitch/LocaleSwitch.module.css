@@ -1,0 +1,16 @@
+.switch {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.option {
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+}
+
+.option[aria-pressed="true"] {
+  font-weight: 700;
+  color: var(--color-text-strong);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}

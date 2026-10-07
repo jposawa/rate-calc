@@ -1,5 +1,6 @@
-import { DEFAULT_VALUES, STORAGE_KEY } from "@/constants"
-import type { FormValues } from "@/types"
+import { LOCALE_KEY, STORAGE_KEY } from "@/constants"
+import { isFxMeta } from "@/helpers"
+import type { FormValues, Locale } from "@/types"
 
 type StoredValues = {
   values: FormValues
@@ -14,7 +15,7 @@ type StoredValues = {
  * em try/catch porque o navegador pode negar o acesso — janela anônima, dados
  * bloqueados — e isso não pode derrubar a página.
  */
-export const loadValues = (): StoredValues | null => {
+export const loadValues = (defaults: FormValues): StoredValues | null => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
 
@@ -28,8 +29,10 @@ export const loadValues = (): StoredValues | null => {
       return null
     }
 
+    const values: FormValues = { ...defaults, ...data.values }
+
     return {
-      values: { ...DEFAULT_VALUES, ...data.values },
+      values: { ...values, fxMeta: isFxMeta(values.fxMeta) ? values.fxMeta : null },
       savedAt: typeof data.savedAt === "number" ? data.savedAt : null,
     }
   } catch {
@@ -53,5 +56,24 @@ export const clearValues = () => {
     localStorage.removeItem(STORAGE_KEY)
   } catch {
     // Sem acesso ao armazenamento não há o que apagar.
+  }
+}
+
+/** O idioma escolhido na última visita, ou `null` se a pessoa nunca escolheu. */
+export const loadLocale = (): Locale | null => {
+  try {
+    const saved = localStorage.getItem(LOCALE_KEY)
+
+    return saved === "pt-BR" || saved === "en" ? saved : null
+  } catch {
+    return null
+  }
+}
+
+export const saveLocale = (locale: Locale) => {
+  try {
+    localStorage.setItem(LOCALE_KEY, locale)
+  } catch {
+    // Sem armazenamento, o idioma vale só nesta visita.
   }
 }
